@@ -3,8 +3,11 @@ venv/
 __pycache__/
 
 # Archivos de configuración de IDEs
-.vscode/
 .idea/
 
 # Otros
 *.pyc
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
+branch_structure.json

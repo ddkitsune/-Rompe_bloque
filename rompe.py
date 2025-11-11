@@ -1,10 +1,10 @@
-<<<<<<< HEAD
 import cv2
 import pygame
 import mediapipe as mp
 import numpy as np
 import random
 from scipy.spatial import distance as dist
+import os
 
 # --- Inicialización de Mediapipe Face Mesh ---
 mp_face_mesh = mp.solutions.face_mesh
@@ -28,11 +28,7 @@ try:
 except pygame.error:
     print("Advertencia: No se encontró 'sonidos/background.mp3'")
 
-break_sound = pygame.mixer.Sound('sonidos/break.wav') if pygame.path.exists('sonidos/break.wav') else None
-funny_sounds = [
-    pygame.mixer.Sound(f'sonidos/funny{i}.wav') for i in range(1, 4)
-    if pygame.path.exists(f'sonidos/funny{i}.wav')
-]
+break_sound = pygame.mixer.Sound('sonidos/break.wav') if os.path.exists('sonidos/break.wav') else None
 
 # --- Estados del Juego ---
 game_state = "MENU" # "MENU", "PLAYING", "GAME_OVER"
@@ -175,7 +171,7 @@ def run_playing_state(results):
     global encava_x, smoothed_encava_x, encava_width, encava_image
     global arepa_x, arepa_y, arepa_speed_x, arepa_speed_y
     global widen_paddle_active, slow_ball_active, widen_paddle_end_time, slow_ball_end_time
-    global score, game_state, blocks_broken_count
+    global score, game_state
 
     # --- Dibujado del Fondo ---
     # Se usa la imagen de fondo estática en lugar de la cámara
@@ -272,13 +268,9 @@ def run_playing_state(results):
             pareds.remove(block)
             arepa_speed_y *= -1
             
-            # --- Lógica de Sonidos al Romper Bloque ---
+            # --- Sonido al Romper Bloque ---
             if break_sound:
                 break_sound.play()
-            blocks_broken_count += 1
-            if blocks_broken_count >= 5 and funny_sounds:
-                random.choice(funny_sounds).play()
-                blocks_broken_count = 0 # Reiniciar contador
 
             if random.random() < POWERUP_CHANCE:
                 powerup_type = random.choice(list(POWERUP_TYPES.keys()))
@@ -322,7 +314,7 @@ def run_game_over_state():
 def reset_game():
     """Reinicia todas las variables del juego para una nueva partida."""
     global game_state, score, arepa_x, arepa_y, arepa_speed_x, arepa_speed_y
-    global pareds, powerups, widen_paddle_active, slow_ball_active, blocks_broken_count
+    global pareds, powerups, widen_paddle_active, slow_ball_active
     global encava_x, smoothed_encava_x, encava_width, encava_image
 
     game_state = "MENU"
@@ -339,7 +331,6 @@ def reset_game():
     powerups.clear()
     widen_paddle_active = False
     slow_ball_active = False
-    blocks_broken_count = 0
 
     pareds.clear()
     block_values = generate_block_values(pared_rows * pared_columns, WIN_SCORE, 5)
@@ -352,7 +343,6 @@ def reset_game():
 
 running = True
 clock = pygame.time.Clock()
-blocks_broken_count = 0 # Contador para los sonidos graciosos
 while running:
     # --- Manejo de Eventos ---
     for event in pygame.event.get():
